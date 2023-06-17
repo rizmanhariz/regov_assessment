@@ -1,4 +1,6 @@
 const Joi = require("joi");
+Joi.objectId = require("joi-objectid")(Joi);
+
 const { AppError } = require("../core/error.core");
 
 async function validateLogin(req, res, next) {
@@ -57,7 +59,26 @@ async function validateUserList(req, res, next) {
   return next();
 }
 
+async function validateUserId(req, res, next) {
+  const inputSchema = Joi.object({
+    userId: Joi
+      .objectId()
+      .required(),
+  });
+
+  try {
+    await inputSchema.validateAsync(req.body, {
+      abortEarly: false,
+    });
+  } catch (err) {
+    return next(new AppError(400, "INPUT001", false, err.message));
+  }
+
+  return next();
+}
+
 module.exports = {
   validateLogin,
   validateUserList,
+  validateUserId,
 };

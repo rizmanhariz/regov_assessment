@@ -1,7 +1,5 @@
-const jwt = require("jsonwebtoken");
-const { addMinutes } = require("date-fns");
 const { createHmac } = require("crypto");
-const { UserModel } = require("../models/user.model");
+const { UserModel, REG_STATUS_ENUM } = require("../models/user.model");
 const { AppError } = require("../core/error.core");
 
 function hashPassword(inputPassword) {
@@ -10,32 +8,25 @@ function hashPassword(inputPassword) {
   return hash.digest("hex");
 }
 
-function signJWT(inputData) {
-  const exp = addMinutes(new Date(), 60).getTime();
-  const token = jwt.sign(
-    {
-      ...inputData,
-      exp,
-    },
-    process.env.JWT_SECRET,
-  );
-  return token;
-}
-
 async function login(req, res) {
   const { username, password } = req.body;
   const hashedPassword = hashPassword(password);
-  const existingUser = await UserModel.findOne({ username, password: hashedPassword });
+  const existingUser = await UserModel.findOne({
+    username,
+    password: hashedPassword,
+    isDeleted: false,
+  });
   if (!existingUser) {
     throw new AppError(401, "AUTH001", true, "INVALID CREDENTIALS");
   }
-  if (!existingUser.isApproved) {
+  if (existingUser.registrationStatus !== REG_STATUS_ENUM.APPROVED) {
     throw new AppError(401, "AUTH001", true, "NOT YET APPROVED");
   }
+  if (existingUser.isSuspended) {
+    throw new AppError(401, "AUTH001", true, "USER SUSPENDED");
+  }
   req.session.userId = existingUser._id.toString();
-  console.log(req.session);
-  const token = signJWT({ id: existingUser._id.toString() });
-  return res.send({ token });
+  return res.send({});
 }
 
 async function register(req, res) {

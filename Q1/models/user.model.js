@@ -1,6 +1,11 @@
 const { Schema, model } = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
 
+const REG_STATUS_ENUM = {
+  PENDING: "PENDING",
+  APPROVED: "APPROVED",
+  REJECTED: "REJECTED",
+};
 const userSchema = new Schema(
   {
     username: {
@@ -15,8 +20,20 @@ const userSchema = new Schema(
     isAdmin: {
       type: Boolean,
       required: false,
+      default: false,
     },
-    isApproved: {
+    registrationStatus: {
+      type: String,
+      required: false,
+      default: REG_STATUS_ENUM.PENDING,
+      enum: Object.values(REG_STATUS_ENUM),
+    },
+    isSuspended: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    isDeleted: {
       type: Boolean,
       required: true,
       default: false,
@@ -30,4 +47,5 @@ const UserModel = model("user", userSchema);
 
 module.exports = {
   UserModel,
+  REG_STATUS_ENUM,
 };
