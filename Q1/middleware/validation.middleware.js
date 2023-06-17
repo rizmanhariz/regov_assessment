@@ -100,9 +100,38 @@ async function validateSearchRepos(req, res, next) {
   return next();
 }
 
+async function validateReport(req, res, next) {
+  const inputSchema = Joi.object({
+    startDate: Joi
+      .date()
+      .required(),
+    endDate: Joi
+      .date()
+      .required(),
+    userId: Joi
+      .objectId()
+      .optional(),
+    category: Joi
+      .string()
+      .valid(...Object.values(CATEGORY_ENUM))
+      .optional(),
+  });
+
+  try {
+    await inputSchema.validateAsync(req.query, {
+      abortEarly: false,
+    });
+  } catch (err) {
+    return next(new AppError(400, "INPUT001", false, err.message));
+  }
+
+  return next();
+}
+
 module.exports = {
   validateLogin,
   validateUserList,
   validateUserId,
   validateSearchRepos,
+  validateReport,
 };

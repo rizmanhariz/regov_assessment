@@ -11,6 +11,7 @@ const logger = require("./core/log.core");
 const authRouter = require("./routes/auth.route");
 const adminRouter = require("./routes/admin.route");
 const searchRouter = require("./routes/search.route");
+const reportRouter = require("./routes/report.route");
 
 // get env variables
 require("dotenv").config();
@@ -37,6 +38,7 @@ app.use(cookieParser());
 app.use("/auth", authRouter);
 app.use("/admin", adminRouter);
 app.use("/search", searchRouter);
+app.use("/report", reportRouter);
 
 app.get("/", (req, res) => {
   res.send("Hey there");
