@@ -115,6 +115,10 @@ async function validateReport(req, res, next) {
       .string()
       .valid(...Object.values(CATEGORY_ENUM))
       .optional(),
+    type: Joi
+      .string()
+      .valid("month", "day", "week")
+      .required(),
   });
 
   try {
