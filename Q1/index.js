@@ -9,6 +9,7 @@ const logger = require("./core/log.core");
 
 // define routers
 const authRouter = require("./routes/auth.route");
+const adminRouter = require("./routes/admin.route");
 
 // get env variables
 require("dotenv").config();
@@ -33,8 +34,8 @@ app.use(sessions({
 app.use(cookieParser());
 
 app.use("/auth", authRouter);
+app.use("/admin", adminRouter);
 // app.use("/search", searchRouter);
-// app.use("/admin", adminRouter);
 
 app.get("/", (req, res) => {
   res.send("Hey there");
